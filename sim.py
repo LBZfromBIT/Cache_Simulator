@@ -358,7 +358,7 @@ def main():
             cache.print_stats()
         
         elif choice == '5':
-            print("谢谢使用，再见！")
+            print("再见！")
             break
         
         else:
