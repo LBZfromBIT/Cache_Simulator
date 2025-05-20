@@ -249,7 +249,7 @@ class Cache:
 def trace_file(cache, memory, filename):
     """从跟踪文件执行指令"""
     try:
-        with open(filename, 'r') as f:
+        with open(filename, 'r',encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
                 if not line or line.startswith('#'):
