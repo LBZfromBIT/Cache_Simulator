@@ -143,6 +143,7 @@ class Cache:
         """从Cache读取数据,如果不命中则从内存读取"""
         self.access_count += 1
         self.read_count += 1
+        self.time += 1
         
         tag, index, offset = self.address_split(address)
         cache_set = self.sets[index]
@@ -153,11 +154,11 @@ class Cache:
             # 命中
             self.hit_count += 1
             self.read_hit_count += 1
+
             # 更新时间戳
             if self.policy == 'LRU':
                 block.last_time = self.time
             
-            self.time += 1
             return block.data[offset] if block.data else None
         else:
             # 未命中，从内存读取
@@ -180,13 +181,13 @@ class Cache:
             # 将块添加到Cache
             cache_set.add_block(new_block)
 
-            self.time += 1
             return data[offset] if data else None
     
     def write(self, address, data, memory):
         """写入数据到Cache"""
         self.access_count += 1
         self.write_count += 1
+        self.time += 1
         
         tag, index, offset = self.address_split(address)
         cache_set = self.sets[index]
@@ -208,10 +209,7 @@ class Cache:
             # 更新时间戳
             if self.policy == 'LRU':
                 block.last_time = self.time
-            
-            self.time += 1
         else:
-            self.time += 1
             # 未命中直接写入内存
             memory.write(address, data)
     
@@ -262,9 +260,9 @@ def trace_file(cache, memory, filename):
                 op = parts[0].lower() # 每行第一部分：操作类型
                 address = int(parts[1], 16)  # 每行第二部分：操作地址 假设地址是十六进制
                 
-                if op == 'r' or op == 'read':
+                if op == 'r' or op == 'read' or op =='R':
                     cache.read(address, memory)
-                elif op == 'w' or op == 'write':
+                elif op == 'w' or op == 'write' or op == 'W':
                     data = int(parts[2]) if len(parts) > 2 else 1  #对写入行的第三部分：操作数 默认写入1
                     cache.write(address, data, memory)
         
